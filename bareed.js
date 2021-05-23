@@ -19,7 +19,7 @@ class Point {
     let xDelta = this.x - point.x;
     let yDelta = this.y - point.y;
     return Math.sqrt(xDelta * xDelta + yDelta * yDelta); // PYTHAGORAS!
-  };
+  }
 
   equals = point => point.x === this.x && point.y === this.y;
 
@@ -43,11 +43,16 @@ class Point {
  **********************************************************/
 class Wallet {
   // implement Wallet!
-  constructor(money = 0) {}
+  constructor(money = 0) {
+ this.money= money;
+  }
+  credit = amount => {
+    this.money= this.money + amount;
+  }
 
-  credit = amount => {};
-
-  debit = amount => {};
+  debit = amount => {
+    this.money= this.money - amount;
+  }
 }
 
 /**********************************************************
@@ -63,8 +68,14 @@ class Wallet {
  **********************************************************/
 class Person {
   // implement Person!
+  constructor(name,x,y){
+  this.name=name;
+  this.location= new Point(x,y);
+  this.wallet= new Wallet(0);
 }
+moveTo = (point) => {this.location= point}
 
+}
 /**********************************************************
  * Vendor: defines a vendor
  * Subclasses Person
@@ -80,9 +91,20 @@ class Person {
  *
  * new vendor = new Vendor(name, x, y);
  **********************************************************/
-class Vendor {
+class Vendor extends Person {
   // implement Vendor!
-}
+  
+  constructor(name,x,y){
+  super(name,x,y)
+  this.range=5;
+  this.price=1;
+  }
+  sellTo= (customer, numberOfIceCreams) => {
+    this.moveTo(customer.location);
+    customer.wallet.debit(numberOfIceCreams*this.price);
+    this.wallet.credit(numberOfIceCreams*this.price);
+} }
+
 
 /**********************************************************
  * Customer: defines a customer
@@ -100,9 +122,27 @@ class Vendor {
  *
  * new customer = new Customer(name, x, y);
  **********************************************************/
-class Customer {
+class Customer extends Person {
   // implement Customer!
+  constructor(name , x ,y,money=10 ){
+  super(name,x,y)
+  this.wallet=new Wallet(money);
+
 }
+
+     
+_isInRange=(vendor)=> {this.location.distanceTo(vendor.location)<= vendor.range};
+
+_haveEnoughMoney=(vendor, numberOfIceCreams)=>{this.wallet.money>=numberOfIceCreams*vendor.price} ;
+
+requestIceCream=(vendor, numberOfIceCreams)=>{
+  if (this._isInRange(vendor) && this._haveEnoughMoney(vendor,numberOfIceCreams)){
+  vendor.sellTo(this,numberOfIceCreams);}
+  
+}
+
+}
+  
 
 export { Point, Wallet, Person, Customer, Vendor };
 
